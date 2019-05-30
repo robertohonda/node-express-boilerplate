@@ -1,0 +1,174 @@
+swagger: "2.0"
+info:
+  description: "Posto API Documentation"
+  version: "1.0.0"
+  title: "Posto API"
+host: "localhost:3000"
+basePath: "/api"
+schemes:
+- "http"
+paths:
+  /accountStatement/point:
+    post:
+      tags:
+      - "Account Statement"
+      summary: "Register QRCode"
+      description: ""
+      operationId: "registerQRCode"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "qrCodeURL that will be register"
+        required: true
+        schema:
+          $ref: "#/definitions/QRCode"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Purchase"
+              
+        400:
+          description: "Bad Request"
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 
+                  oneOf:
+                  - "issuedAt is before today"
+                  - "the total did not reach the minimum limit"
+                  - "issuedAt interval exceeded"
+                  - "daily maximum limit exceeded"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not Found"
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "station not found"
+        500:
+          description: "INTERNAL SERVER ERROR"
+  /accountStatement/user:
+    get:
+      tags:
+      - "Account Statement"
+      summary: "Register QRCode"
+      description: ""
+      operationId: "getAccountStatementByUer"
+      parameters: []
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: object
+            properties:
+              accountStatement:
+                $ref: '#/definitions/AccountStatement'
+              totalPurchaseOfMonth:
+                type: integer
+                example: 5
+              discount:
+                type: number
+                example: 0.05
+        401:
+          description: "Unauthorized"
+        500:
+          description: "INTERNAL SERVER ERROR"
+
+definitions:
+  QRCode:
+    type: "object"
+    required:
+    - "qrCodeURL"
+    properties:
+      qrCodeURL:
+        type: string
+        example: "http://www.dfe.ms.gov.br/nfce/qrcode?p="
+        
+  AccountStatement:
+    type: "object"
+    properties:
+      _id:
+        type: "integer"
+        format: "int64"
+      # user:
+        # $ref: "#/definitions/User"
+      purchases:
+        type: "array"
+        items:
+          $ref: "#/definitions/Purchase"
+    
+  Purchase:
+    type: "object"
+    required:
+    - "accessKey"
+    - "discount"
+    - "station"
+    - "fuels"
+    - "total"
+    - "issuedAt"
+    properties:
+      _id:
+        type: "integer"
+        format: "int64"
+      accessKey:
+        type: string
+      discount:
+        type: integer
+        example: 0.5
+      # station:
+        # $ref: "#/definitions/Station"
+      fuels:
+        type: "array"
+        items:
+          $ref: "#/definitions/Fuel"
+      total: 
+        type: number
+        example: 50.25
+      issuedAt:
+        type: string
+        example: "2019-04-30T18:20:24.000Z"
+        
+  Fuel:
+    type: "object"
+    required:
+    - "name"
+    - "quantity"
+    - "unit"
+    - "price"
+    - "total"
+    properties:
+      _id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: string
+        example: "GASOLINA"
+      code:
+        type: integer
+        example: 4
+      quantity:
+        type: number
+        example: 10.5
+      unit:
+        type: string
+        example: "LT"
+      price: 
+        type: number
+        example: 3.499
+      total: 
+        type: number
+        example: 50.25
