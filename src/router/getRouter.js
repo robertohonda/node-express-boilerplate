@@ -2,19 +2,19 @@ import { Router } from 'express'
 import controllerHandler from '../middlewares/controller'
 
 export const getRouter = (routes) => {
-  const router = Router()
+  return routes.reduce((router, route) => {
+    const {
+      path,
+      method,
+      controller,
+      middlewares = [],
+      routes: childRoutes,
+    } = route
 
-  routes.forEach(
-    ({ path, method, controller, middlewares = [], routes: childRoutes }) => {
-      if (childRoutes != null) {
-        router.use(path, ...middlewares, getRouter(childRoutes))
-        return
-      }
-      router[method](path, ...middlewares, controllerHandler(controller))
-    },
-  )
-
-  return router
+    if (childRoutes != null)
+      return router.use(path, ...middlewares, getRouter(childRoutes))
+    return router[method](path, ...middlewares, controllerHandler(controller))
+  }, Router())
 }
 
 export default getRouter
