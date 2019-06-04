@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
-import routes from '../../routes'
+import router from '../../router'
 import errors from '../../middlewares/errors'
 
 const app = express()
@@ -16,7 +16,7 @@ app.use(morgan('dev'))
 
 app.disable('etag')
 
-app.use('/api', routes)
+app.use('/api', router)
 
 app.use('/api', errors.handleError)
 
